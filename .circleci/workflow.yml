@@ -21,7 +21,9 @@ jobs:
       - checkout
       - run:
           name: Builds the frontend
-          command: echo "Frontend Build triggered"
+          command: |
+            echo "Frontend Build triggered"
+            pwd
 
   deploy_frontend:
     executor: ubuntu_machine:
