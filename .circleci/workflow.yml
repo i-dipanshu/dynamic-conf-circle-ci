@@ -23,7 +23,7 @@ jobs:
           name: Builds the frontend
           command: |
             echo "Frontend Build triggered"
-            pwd
+            ls -la
 
   deploy_frontend:
     executor: ubuntu_machine
