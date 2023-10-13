@@ -49,11 +49,10 @@ jobs:
           name: Push the Docker Image
           command: |
               TAG=v0.0.$CIRCLE_BUILD_NUM
-              IMAGE_NAME=$DOCKER_USER/demo-react-frontend:TAG
+              IMAGE_NAME=$DOCKER_USER/demo-react-frontend:$TAG
               echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
               docker push $IMAGE_NAME
             
-
   build_backend:
     executor: docker_executor
     steps:
