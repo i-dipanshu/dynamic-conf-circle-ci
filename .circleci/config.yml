@@ -10,7 +10,7 @@ orbs:
 
 workflows:
   # The always-run workflow is always triggered, regardless of the pipeline parameters.
-  always-run:
+  generate-config:
     jobs:
       # The path-filtering/filter job determines which pipeline
       # parameters to update.
