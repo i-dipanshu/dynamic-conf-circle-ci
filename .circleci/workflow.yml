@@ -16,7 +16,7 @@ executors:
 jobs:
 
   build_frontend:
-    executor: ubuntu_machine:
+    executor: ubuntu_machine
     steps:
       - checkout
       - run:
@@ -26,7 +26,7 @@ jobs:
             pwd
 
   deploy_frontend:
-    executor: ubuntu_machine:
+    executor: ubuntu_machine
     steps:
       - checkout
       - run:
@@ -34,7 +34,7 @@ jobs:
           command: echo "Frontend Deployment triggered"
 
   build_backend:
-    executor: ubuntu_machine:
+    executor: ubuntu_machine
     steps:
       - checkout
       - run:
@@ -42,7 +42,7 @@ jobs:
           command: echo "Backend Build triggered"
           
   deploy_backend:
-    executor: ubuntu_machine:
+    executor: ubuntu_machine
     steps:
       - checkout
       - run:
