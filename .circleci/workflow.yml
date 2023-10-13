@@ -21,15 +21,12 @@ jobs:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
-      - run:
-          name: Change the directory
-          command: cd frontend
       - run: 
           name: Build the Image 
           command: | 
             TAG=v0.0.$CIRCLE_BUILD_NUM
             IMAGE_NAME=$DOCKER_USER/demo-react-frontend:$TAG
-            docker build -t  $IMAGE_NAME .
+            docker build -t  $IMAGE_NAME frontend
             # Persist the image to the workspace
             docker save -o new-image.tar $IMAGE_NAME
       - persist_to_workspace:
