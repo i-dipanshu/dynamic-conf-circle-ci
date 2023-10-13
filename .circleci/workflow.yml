@@ -9,45 +9,69 @@ parameters:
     default: false
 
 executors:
-  ubuntu_machine:
-    machine:
-      image: ubuntu-2204:2023.07.2
+  docker_executor:
+    docker:
+      - image: cimg/base:current
 
 jobs:
 
   build_frontend:
-    executor: ubuntu_machine
+    executor: docker_executor
     steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
-          name: Builds the frontend
-          command: |
-            echo "Frontend Build triggered"
-            cat ./frontend/sample.txt
+          name: Change the directory
+          command: cd frontend
+      - run: 
+          name: Build the Image 
+          command: | 
+            TAG=v0.0.$CIRCLE_BUILD_NUM
+            IMAGE_NAME=$DOCKER_USER/demo-react-frontend:$TAG
+            docker build -t  $IMAGE_NAME .
+            # Persist the image to the workspace
+            docker save -o new-image.tar $IMAGE_NAME
+      - persist_to_workspace:
+          root: .
+          paths:
+            - new-image.tar
 
-  deploy_frontend:
-    executor: ubuntu_machine
+  push_frontend:
+    executor: docker_executor
     steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - attach_workspace:
+          at: .
       - run:
-          name: Builds the frontend
-          command: echo "Frontend Deployment triggered"
+          name: Load Docker image
+          command:  docker load -i new-image.tar
+      - run:
+          name: Push the Docker Image
+          command: |
+              TAG=v0.0.$CIRCLE_BUILD_NUM
+              IMAGE_NAME=$DOCKER_USER/demo-react-frontend:
+              echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+              docker push $IMAGE_NAME
+            
 
   build_backend:
-    executor: ubuntu_machine
+    executor: docker_executor
     steps:
       - checkout
       - run:
           name: Builds the backend
           command: echo "Backend Build triggered"
           
-  deploy_backend:
-    executor: ubuntu_machine
+  push_backend:
+    executor: docker_executor
     steps:
       - checkout
       - run:
           name: Builds the backend
-          command: echo "Backend Deploy triggered"
+          command: echo "Backend push triggered"
 
 workflows:
   frontend_workflow:
@@ -55,7 +79,7 @@ workflows:
       <<pipeline.parameters.run-frontend-workflow>>
     jobs:
       - build_frontend
-      - deploy_frontend:
+      - push_frontend:
           requires:
             - build_frontend
           filters:
@@ -67,7 +91,7 @@ workflows:
       <<pipeline.parameters.run-backend-workflow>>
     jobs:
       - build_backend
-      - deploy_backend:
+      - push_backend:
           requires:
             - build_backend
           filters:

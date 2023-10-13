@@ -38,3 +38,82 @@ workflows:
           # path filtering and pipeline parameter value updates are complete.
           config-path: .circleci/workflow.yml
 ```
+
+## 2. Sample Workflow for monolithic repo
+```yaml
+version: 2.1
+
+parameters:
+  run-backend-workflow:
+    type: boolean
+    default: false
+  run-frontend-workflow:
+    type: boolean 
+    default: false
+
+executors:
+  ubuntu_machine:
+    machine:
+      image: ubuntu-2204:2023.07.2
+
+jobs:
+
+  build_frontend:
+    executor: ubuntu_machine
+    steps:
+      - checkout
+      - run:
+          name: Builds the frontend
+          command: |
+            echo "Frontend Build triggered"
+            cat ./frontend/sample.txt
+
+  deploy_frontend:
+    executor: ubuntu_machine
+    steps:
+      - checkout
+      - run:
+          name: Builds the frontend
+          command: echo "Frontend Deployment triggered"
+
+  build_backend:
+    executor: ubuntu_machine
+    steps:
+      - checkout
+      - run:
+          name: Builds the backend
+          command: echo "Backend Build triggered"
+          
+  deploy_backend:
+    executor: ubuntu_machine
+    steps:
+      - checkout
+      - run:
+          name: Builds the backend
+          command: echo "Backend Deploy triggered"
+
+workflows:
+  frontend_workflow:
+    when:
+      <<pipeline.parameters.run-frontend-workflow>>
+    jobs:
+      - build_frontend
+      - deploy_frontend:
+          requires:
+            - build_frontend
+          filters:
+            branches:
+              only: main
+  
+  backend_workflow:
+    when:
+      <<pipeline.parameters.run-backend-workflow>>
+    jobs:
+      - build_backend
+      - deploy_backend:
+          requires:
+            - build_backend
+          filters:
+            branches:
+              only: main
+```
