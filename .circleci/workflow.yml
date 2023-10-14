@@ -37,7 +37,7 @@ jobs:
           at: .
       - docker/check
       - docker/push:
-          image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+          image: $DOCKER_USER/demo-react-frontend:latest
 
 
 
