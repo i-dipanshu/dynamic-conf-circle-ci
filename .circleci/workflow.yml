@@ -21,6 +21,7 @@ jobs:
       - checkout
       - docker/build:
           docker-context: frontend
+          path: ./frontend
           image: $DOCKER_USER/demo-react-frontend
           tag: <<pipeline.parameters.image-tag>>
           attach-at: .
