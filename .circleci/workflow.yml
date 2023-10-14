@@ -26,7 +26,6 @@ jobs:
           tag: <<pipeline.parameters.image-tag>>
           attach-at: .
 
-
   publish_frontend:
     executor: docker/machine
     steps:
@@ -39,16 +38,15 @@ jobs:
           tag: <<pipeline.parameters.image-tag>>
 
 
-
 workflows:
   build_frontend_workflow:
     when:
       <<pipeline.parameters.run-frontend-workflow>>
     jobs:
       - build_frontend
-      # - publish_frontend:
-      #     requires:
-      #       - build_frontend
-      #     filters:
-      #       branches:
-      #         only: main
+      - publish_frontend:
+          requires:
+            - build_frontend
+          filters:
+            branches:
+              only: main
