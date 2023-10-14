@@ -22,10 +22,11 @@ jobs:
       - run:
           name: check the pwd and change dir
           command: |
-            pwd 
+            ls
             cd frontend
+            ls
       - docker/build:
-          image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+          image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME:latest
           attach-at: './'
 
   publish_frontend:
