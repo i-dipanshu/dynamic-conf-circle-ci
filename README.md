@@ -117,3 +117,120 @@ workflows:
             branches:
               only: main
 ```
+
+## 3. Sample workflow using docker executors
+```yaml
+version: 2.1
+
+parameters:
+  run-backend-workflow:
+    type: boolean
+    default: false
+  run-frontend-workflow:
+    type: boolean 
+    default: false
+
+executors:
+  docker_executor:
+    docker:
+      - image: cimg/base:current
+
+jobs:
+
+  build_frontend:
+    executor: docker_executor
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: 
+          name: Build the Image 
+          command: | 
+            IMAGE_NAME=$DOCKER_USER/demo-react-frontend:latest
+            docker build -t  $IMAGE_NAME frontend
+            # Persist the image to the workspace
+            docker save -o new-image.tar $IMAGE_NAME
+      - persist_to_workspace:
+          root: .
+          paths:
+            - new-image.tar
+
+  push_frontend:
+    executor: docker_executor
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - attach_workspace:
+          at: .
+      - run:
+          name: Load Docker image
+          command:  docker load -i new-image.tar
+      - run:
+          name: Push the Docker Image
+          command: |
+              IMAGE_NAME=$DOCKER_USER/demo-react-frontend:latest
+              echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+              docker push $IMAGE_NAME
+            
+  build_backend:
+    executor: docker_executor
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: 
+          name: Build the Image 
+          command: | 
+            IMAGE_NAME=$DOCKER_USER/demo-flask-backend:latest
+            docker build -t  $IMAGE_NAME backend
+            # Persist the image to the workspace
+            docker save -o new-image.tar $IMAGE_NAME
+      - persist_to_workspace:
+          root: .
+          paths:
+            - new-image.tar
+          
+  push_backend:
+    executor: docker_executor
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - attach_workspace:
+          at: .
+      - run:
+          name: Load Docker image
+          command:  docker load -i new-image.tar
+      - run:
+          name: Push the Docker Image
+          command: |
+              IMAGE_NAME=$DOCKER_USER/demo-flask-backend:latest
+              echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+              docker push $IMAGE_NAME
+
+workflows:
+  frontend_workflow:
+    when:
+      <<pipeline.parameters.run-frontend-workflow>>
+    jobs:
+      - build_frontend
+      - push_frontend:
+          requires:
+            - build_frontend
+          filters:
+            branches:
+              only: main
+  
+  backend_workflow:
+    when:
+      <<pipeline.parameters.run-backend-workflow>>
+    jobs:
+      - build_backend
+      - push_backend:
+          requires:
+            - build_backend
+          filters:
+            branches:
+              only: main
+```
