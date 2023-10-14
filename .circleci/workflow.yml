@@ -32,7 +32,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - docker/check
+      - docker/check:
           docker-password: $DOCKER_PASS
           docker-username: $DOCKER_USER
       - docker/push:
