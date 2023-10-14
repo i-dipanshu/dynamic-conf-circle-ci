@@ -11,8 +11,6 @@ parameters:
     type: string
     default: "latest"
 
-  
-
 orbs:
   docker: circleci/docker@2.4.0
 
@@ -25,27 +23,22 @@ jobs:
           docker-context: frontend
           path: ./frontend
           image: $DOCKER_USER/demo-react-frontend
-          tag: <<pipeline.parameters.image-tag>>
-          attach-at: .
-      - run:
-          command: ls -la
+          tag: $CIRCLE_BUILD_NUM
 
   publish_frontend:
     executor: docker/machine
     steps:
       - checkout
-      - attach_workspace:
-          at: .
-      - run:
-          command: | 
-            ls -la
-            docker images
+      - docker/build:
+          path: ./frontend
+          image: $DOCKER_USER/demo-react-frontend
+          tag: $CIRCLE_BUILD_NUM
       - docker/check:
           docker-password: DOCKER_PASS
           docker-username: DOCKER_USER
       - docker/push:
           image: $DOCKER_USER/demo-react-frontend
-          tag: <<pipeline.parameters.image-tag>>
+          tag: $CIRCLE_BUILD_NUM
 
 
 workflows:
