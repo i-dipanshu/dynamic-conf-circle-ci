@@ -30,6 +30,7 @@ jobs:
     steps:
       - checkout
       - docker/build:
+          docker-context: frontend
           path: ./frontend
           image: $DOCKER_USER/demo-react-frontend
           tag: $CIRCLE_BUILD_NUM
