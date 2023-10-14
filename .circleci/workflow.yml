@@ -34,11 +34,11 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-      # - docker/build:
-      #     docker-context: frontend
-      #     path: ./frontend
-      #     image: $DOCKER_USER/demo-react-frontend
-      #     tag: $CIRCLE_BUILD_NUM
+      - docker/build:
+          docker-context: frontend
+          path: ./frontend
+          image: $DOCKER_USER/demo-react-frontend
+          tag: $CIRCLE_BUILD_NUM
       - docker/check:
           docker-password: DOCKER_PASS
           docker-username: DOCKER_USER
