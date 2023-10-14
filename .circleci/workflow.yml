@@ -19,15 +19,12 @@ jobs:
     executor: docker/machine
     steps:
       - checkout
-      - run:
-          name: check the pwd and change dir
-          command: |
-            ls
-            cd frontend
-            ls
       - docker/build:
-          image: $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME:latest
-          attach-at: './'
+          docker-context: frontend
+          image: $DOCKER_USER/demo-react-frontend
+          tag: <<pipeline.parameters.image-tag>>
+          attach-at: .
+
 
   publish_frontend:
     executor: docker/machine
@@ -37,7 +34,8 @@ jobs:
           at: .
       - docker/check
       - docker/push:
-          image: $DOCKER_USER/demo-react-frontend:latest
+          image: $DOCKER_USER/demo-react-frontend
+          tag: <<pipeline.parameters.image-tag>>
 
 
 
