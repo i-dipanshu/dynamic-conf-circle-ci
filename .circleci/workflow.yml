@@ -24,16 +24,21 @@ jobs:
           path: ./frontend
           image: $DOCKER_USER/demo-react-frontend
           tag: $CIRCLE_BUILD_NUM
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./*
 
   publish_frontend:
     executor: docker/machine
     steps:
-      - checkout
-      - docker/build:
-          docker-context: frontend
-          path: ./frontend
-          image: $DOCKER_USER/demo-react-frontend
-          tag: $CIRCLE_BUILD_NUM
+      - attach_workspace:
+          at: .
+      # - docker/build:
+      #     docker-context: frontend
+      #     path: ./frontend
+      #     image: $DOCKER_USER/demo-react-frontend
+      #     tag: $CIRCLE_BUILD_NUM
       - docker/check:
           docker-password: DOCKER_PASS
           docker-username: DOCKER_USER
