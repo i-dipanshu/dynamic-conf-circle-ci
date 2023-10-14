@@ -9,7 +9,7 @@ orbs:
   path-filtering: circleci/path-filtering@1.0.0
 
 workflows:
-  # The always-run workflow is always triggered, regardless of the pipeline parameters.
+  # The generate-config workflow is always triggered, regardless of the pipeline parameters.
   generate-config:
     jobs:
       # The path-filtering/filter job determines which pipeline
