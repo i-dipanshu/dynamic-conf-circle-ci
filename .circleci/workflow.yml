@@ -27,6 +27,8 @@ jobs:
           image: $DOCKER_USER/demo-react-frontend
           tag: <<pipeline.parameters.image-tag>>
           attach-at: .
+      - run:
+          command: ls -la
 
   publish_frontend:
     executor: docker/machine
@@ -34,6 +36,10 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
+      - run:
+          command: | 
+            ls -la
+            docker images
       - docker/check:
           docker-password: DOCKER_PASS
           docker-username: DOCKER_USER
