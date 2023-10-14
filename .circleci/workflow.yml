@@ -7,9 +7,9 @@ parameters:
   run-frontend-workflow:
     type: boolean 
     default: false
-  image-tag: 
-    type: string
-    default: latest
+  # image-tag: 
+  #   type: string
+  #   default: "latest"
 
 orbs:
   docker: circleci/docker@2.4.0
