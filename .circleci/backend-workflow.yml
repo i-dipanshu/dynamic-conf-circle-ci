@@ -4,9 +4,6 @@ parameters:
   run-backend-workflow:
     type: boolean
     default: false
-  run-frontend-workflow:
-    type: boolean 
-    default: false
   image-tag: 
     type: string
     default: "latest"
@@ -15,43 +12,43 @@ orbs:
   docker: circleci/docker@2.4.0
 
 jobs:
-  build_frontend:
+  build_backend:
     executor: docker/machine
     steps:
       - checkout
       - docker/build:
-          docker-context: frontend
-          path: ./frontend
-          image: $DOCKER_USER/demo-react-frontend
+          docker-context: backend
+          path: ./backend
+          image: $DOCKER_USER/demo-flask-backend
           tag: $CIRCLE_BUILD_NUM
 
-  publish_frontend:
+  publish_backend:
     executor: docker/machine
     steps:
       - checkout
       - docker/build:
-          docker-context: frontend
-          path: ./frontend
-          image: $DOCKER_USER/demo-react-frontend
+          docker-context: backend
+          path: ./backend
+          image: $DOCKER_USER/demo-flask-backend
           tag: $CIRCLE_BUILD_NUM
       - docker/check:
           docker-password: DOCKER_PASS
           docker-username: DOCKER_USER
       - docker/push:
-          image: $DOCKER_USER/demo-react-frontend
+          image: $DOCKER_USER/demo-flask-backend
           tag: $CIRCLE_BUILD_NUM
 
 
 workflows:
-  build_frontend_workflow:
+  backend_workflow:
     when:
-      <<pipeline.parameters.run-frontend-workflow>>
+      <<pipeline.parameters.run-backend-workflow>>
     jobs:
-      - build_frontend:
+      - build_backend:
           filters:
             branches:
               ignore: main
-      - publish_frontend:
+      - publish_backend:
           filters:
             branches:
               only: main

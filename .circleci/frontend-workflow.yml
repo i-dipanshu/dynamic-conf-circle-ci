@@ -1,0 +1,54 @@
+version: 2.1
+
+parameters:
+  run-frontend-workflow:
+    type: boolean 
+    default: false
+  image-tag: 
+    type: string
+    default: "latest"
+
+orbs:
+  docker: circleci/docker@2.4.0
+
+jobs:
+  build_frontend:
+    executor: docker/machine
+    steps:
+      - checkout
+      - docker/build:
+          docker-context: frontend
+          path: ./frontend
+          image: $DOCKER_USER/demo-react-frontend
+          tag: $CIRCLE_BUILD_NUM
+
+  publish_frontend:
+    executor: docker/machine
+    steps:
+      - checkout
+      - docker/build:
+          docker-context: frontend
+          path: ./frontend
+          image: $DOCKER_USER/demo-react-frontend
+          tag: $CIRCLE_BUILD_NUM
+      - docker/check:
+          docker-password: DOCKER_PASS
+          docker-username: DOCKER_USER
+      - docker/push:
+          image: $DOCKER_USER/demo-react-frontend
+          tag: $CIRCLE_BUILD_NUM
+
+
+workflows:
+  frontend_workflow:
+    when:
+      <<pipeline.parameters.run-frontend-workflow>>
+    jobs:
+      - build_frontend:
+          filters:
+            branches:
+              ignore: main
+      - publish_frontend:
+          filters:
+            branches:
+              only: main
