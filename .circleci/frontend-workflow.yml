@@ -11,7 +11,6 @@ parameters:
 orbs:
   docker: circleci/docker@2.4.0
 
-
 commands:
   build_frontend:
     steps:
@@ -42,7 +41,6 @@ jobs:
     steps:
       - build_frontend
       - publish_frontend
-
 
 workflows:
   frontend_workflow:
