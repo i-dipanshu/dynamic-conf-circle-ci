@@ -1,0 +1,106 @@
+version: 2.1
+
+parameters:
+  run-frontend-workflow:
+    type: boolean 
+    default: false
+  run-backend-workflow:
+    type: boolean 
+    default: false
+  image-tag: 
+    type: string
+    default: "latest"
+
+orbs:
+  docker: circleci/docker@2.4.0
+
+commands:
+  build:
+    parameters:
+      dir:
+        type: string
+      tool:
+        type: string
+    steps:
+      - checkout
+      - setup_remote_docker
+      - docker/build:
+          docker-context: <<parameters.dir>>
+          path: <<parameters.dir>>
+          image: $DOCKER_USER/demo-<<parameters.tool>>-<<parameters.dir>>
+          tag: $CIRCLE_BUILD_NUM
+
+  publish:
+    parameters:
+      dir:
+        type: string
+      tool:
+        type: string
+    steps:
+      - docker/check:
+          docker-password: DOCKER_PASS
+          docker-username: DOCKER_USER
+      - docker/push:
+          image: $DOCKER_USER/<<parameters.tool>>-<<parameters.dir>>
+          tag: $CIRCLE_BUILD_NUM
+
+jobs:
+  build_frontend_job:
+    executor: docker/docker
+    steps:
+      - build:
+          dir: frontend
+          tool: react
+
+  publish_frontend_job:
+    executor: docker/docker
+    steps:
+      - build:
+          dir: frontend
+          tool: react
+      - publish:
+          dir: frontend
+          tool: react
+
+  build_backend_job:
+    executor: docker/docker
+    steps:
+      - build:
+          dir: backend
+          tool: flask
+
+  publish_backend_job:
+    executor: docker/docker
+    steps:
+      - build:
+          dir: backend
+          tool: flask
+      - publish:
+          dir: backend
+          tool: flask
+
+workflows:
+  frontend_workflow:
+    when:
+      <<pipeline.parameters.run-frontend-workflow>>
+    jobs:
+      - build_frontend_job:
+          filters:
+            branches:
+              ignore: main
+      - publish_frontend_job:
+          filters:
+            branches:
+              only: main
+  backend_workflow:
+    when:
+      <<pipeline.parameters.run-backend-workflow>>
+    jobs:
+      - build_backend_job:
+          filters:
+            branches:
+              ignore: main
+      - publish_backend_job:
+          filters:
+            branches:
+              only: main

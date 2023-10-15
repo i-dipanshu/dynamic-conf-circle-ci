@@ -11,26 +11,18 @@ parameters:
 orbs:
   docker: circleci/docker@2.4.0
 
-jobs:
+commands:
   build_backend:
-    executor: docker/machine
     steps:
       - checkout
+      - setup_remote_docker
       - docker/build:
           docker-context: backend
           path: ./backend
           image: $DOCKER_USER/demo-flask-backend
           tag: $CIRCLE_BUILD_NUM
-
   publish_backend:
-    executor: docker/machine
     steps:
-      - checkout
-      - docker/build:
-          docker-context: backend
-          path: ./backend
-          image: $DOCKER_USER/demo-flask-backend
-          tag: $CIRCLE_BUILD_NUM
       - docker/check:
           docker-password: DOCKER_PASS
           docker-username: DOCKER_USER
@@ -38,17 +30,28 @@ jobs:
           image: $DOCKER_USER/demo-flask-backend
           tag: $CIRCLE_BUILD_NUM
 
+jobs:
+  build_backend_job:
+    executor: docker/docker
+    steps:
+      - build_backend
+
+  publish_backend_job:
+    executor: docker/docker
+    steps:
+      - build_backend
+      - publish_backend
 
 workflows:
   backend_workflow:
     when:
       <<pipeline.parameters.run-backend-workflow>>
     jobs:
-      - build_backend:
+      - build_backend_job:
           filters:
             branches:
               ignore: main
-      - publish_backend:
+      - publish_backend_job:
           filters:
             branches:
               only: main
