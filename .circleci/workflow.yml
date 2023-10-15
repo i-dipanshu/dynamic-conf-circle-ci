@@ -41,7 +41,7 @@ commands:
           docker-password: DOCKER_PASS
           docker-username: DOCKER_USER
       - docker/push:
-          image: $DOCKER_USER/<<parameters.tool>>-<<parameters.dir>>
+          image: $DOCKER_USER/demo-<<parameters.tool>>-<<parameters.dir>>
           tag: $CIRCLE_BUILD_NUM
 
 jobs:
