@@ -28,6 +28,7 @@ jobs:
   publish_frontend:
     executor: docker/machine
     steps:
+      - checkout
       - docker/build:
           docker-context: frontend
           path: ./frontend
