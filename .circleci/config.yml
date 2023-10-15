@@ -30,4 +30,4 @@ workflows:
 
           # # This is the path of the configuration that will trigger once
           # # path filtering and pipeline parameter value updates are complete.
-          # config-path: .circleci/workflow.yml
+          config-path: .circleci/config.yml
