@@ -8,12 +8,14 @@ parameters:
     type: string
     default: "latest"
 
+orbs:
+  docker: circleci/docker@2.4.0
+
+
 commands:
   build_frontend:
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
       - docker/build:
           docker-context: frontend
           path: ./frontend
@@ -28,12 +30,9 @@ commands:
           image: $DOCKER_USER/demo-react-frontend
           tag: $CIRCLE_BUILD_NUM
 
-orbs:
-  docker: circleci/docker@2.4.0
-
 jobs:
   build_frontend_job:
-    executor: docker/machine
+    executor: docker/docker
     steps:
       - build_frontend
 
