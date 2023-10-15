@@ -24,16 +24,10 @@ jobs:
           path: ./frontend
           image: $DOCKER_USER/demo-react-frontend
           tag: $CIRCLE_BUILD_NUM
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./*
 
   publish_frontend:
     executor: docker/machine
     steps:
-      - attach_workspace:
-          at: .
       - docker/build:
           docker-context: frontend
           path: ./frontend
@@ -52,10 +46,11 @@ workflows:
     when:
       <<pipeline.parameters.run-frontend-workflow>>
     jobs:
-      - build_frontend
+      - build_frontend:
+          filters:
+            branches:
+              ignore: main
       - publish_frontend:
-          requires:
-            - build_frontend
           filters:
             branches:
               only: main
