@@ -8,29 +8,19 @@ parameters:
     type: string
     default: "latest"
 
-orbs:
-  docker: circleci/docker@2.4.0
-
-jobs:
+commands:
   build_frontend:
-    executor: docker/machine
     steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
       - docker/build:
           docker-context: frontend
           path: ./frontend
           image: $DOCKER_USER/demo-react-frontend
           tag: $CIRCLE_BUILD_NUM
-
   publish_frontend:
-    executor: docker/machine
     steps:
-      - checkout
-      - docker/build:
-          docker-context: frontend
-          path: ./frontend
-          image: $DOCKER_USER/demo-react-frontend
-          tag: $CIRCLE_BUILD_NUM
       - docker/check:
           docker-password: DOCKER_PASS
           docker-username: DOCKER_USER
@@ -38,17 +28,32 @@ jobs:
           image: $DOCKER_USER/demo-react-frontend
           tag: $CIRCLE_BUILD_NUM
 
+orbs:
+  docker: circleci/docker@2.4.0
+
+jobs:
+  build_frontend_job:
+    executor: docker/machine
+    steps:
+      - build_frontend
+
+  publish_frontend_job:
+    executor: docker/machine
+    steps:
+      - build_frontend
+      - publish_frontend
+
 
 workflows:
   frontend_workflow:
     when:
       <<pipeline.parameters.run-frontend-workflow>>
     jobs:
-      - build_frontend:
+      - build_frontend_job:
           filters:
             branches:
               ignore: main
-      - publish_frontend:
+      - publish_frontend_job:
           filters:
             branches:
               only: main
