@@ -16,6 +16,7 @@ commands:
   build_frontend:
     steps:
       - checkout
+      - setup_remote_docker
       - docker/build:
           docker-context: frontend
           path: ./frontend
@@ -37,7 +38,7 @@ jobs:
       - build_frontend
 
   publish_frontend_job:
-    executor: docker/machine
+    executor: docker/docker
     steps:
       - build_frontend
       - publish_frontend
