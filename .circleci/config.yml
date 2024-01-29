@@ -17,9 +17,10 @@ jobs:
       - run:
           name: Fetch and Extract Previous Remote Head SHA
           command: |
-            git fetch origin
-            echo $(git rev-parse origin/main@{1})
-            echo 'export PREVIOUS_REMOTE_HEAD_SHA=$(git rev-parse origin/main@{1})' >> "$BASH_ENV"
+            ls 
+            echo $(git rev-parse << pipeline.git.branch >>~1)
+            echo $(git rev-parse origin/<< pipeline.git.branch >>~1)
+            echo 'export PREVIOUS_REMOTE_HEAD_SHA=$(git rev-parse origin/<< pipeline.git.branch >>~1)' >> "$BASH_ENV"
 
 workflows:
   # The generate-config workflow is always triggered, regardless of the pipeline parameters.
