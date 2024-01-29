@@ -14,6 +14,17 @@ workflows:
     jobs:
       # The path-filtering/filter job determines which pipeline
       # parameters to update.
+      extract-previous-remote-head-sha:
+        parameters:
+          prev_head_remote:
+            type: string
+        steps:
+          - checkout
+          - run:
+              name: Fetch and Extract Previous Remote Head SHA
+              command: |
+                git fetch origin
+                echo 'export PREVIOUS_REMOTE_HEAD_SHA=$(git rev-parse origin/main@{1})' >> "$BASH_ENV"
       - path-filtering/filter:
           # the base-revision is the main branch.
           # Any commit pushed to any development branch will
@@ -22,7 +33,7 @@ workflows:
           # development is merged into main and pushed to GitHub.
           # The orb is smart enough to detect commits pushed to the same branch as the base-revision.
           # In this scenario, the orb compares the new commit against the previous commit on the main branch (aka HEAD~1).
-          base-revision: main
+          base-revision: $PREVIOUS_REMOTE_HEAD_SHA
 
           mapping: |
             backend/.* run-backend-workflow true 
