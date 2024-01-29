@@ -9,7 +9,6 @@ orbs:
   path-filtering: viar/path-filtering@0.0.1
 
 workflows:
-  # The generate-config workflow is always triggered, regardless of the pipeline parameters.
   generate-config:
     jobs:
     - path-filtering/filter:
