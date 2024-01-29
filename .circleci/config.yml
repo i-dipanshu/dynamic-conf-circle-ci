@@ -7,6 +7,18 @@ setup: true
 # the path of an updated file_set
 orbs:
   path-filtering: circleci/path-filtering@1.0.0
+  docker: circleci/docker@2.4.0
+
+jobs: 
+  extract-previous-remote-head-sha:
+    executor: docker/docker
+    steps:
+      - checkout
+      - run:
+          name: Fetch and Extract Previous Remote Head SHA
+          command: |
+            git fetch origin
+            echo 'export PREVIOUS_REMOTE_HEAD_SHA=$(git rev-parse origin/main@{1})' >> "$BASH_ENV"
 
 workflows:
   # The generate-config workflow is always triggered, regardless of the pipeline parameters.
@@ -14,17 +26,7 @@ workflows:
     jobs:
       # The path-filtering/filter job determines which pipeline
       # parameters to update.
-      extract-previous-remote-head-sha:
-        parameters:
-          prev_head_remote:
-            type: string
-        steps:
-          - checkout
-          - run:
-              name: Fetch and Extract Previous Remote Head SHA
-              command: |
-                git fetch origin
-                echo 'export PREVIOUS_REMOTE_HEAD_SHA=$(git rev-parse origin/main@{1})' >> "$BASH_ENV"
+      - extract-previous-remote-head-sha
       - path-filtering/filter:
           # the base-revision is the main branch.
           # Any commit pushed to any development branch will
