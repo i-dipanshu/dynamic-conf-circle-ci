@@ -18,6 +18,7 @@ jobs:
           name: Fetch and Extract Previous Remote Head SHA
           command: |
             git fetch origin
+            echo $(git rev-parse origin/main@{1})
             echo 'export PREVIOUS_REMOTE_HEAD_SHA=$(git rev-parse origin/main@{1})' >> "$BASH_ENV"
 
 workflows:
