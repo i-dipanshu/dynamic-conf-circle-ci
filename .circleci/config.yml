@@ -12,7 +12,7 @@ workflows:
   generate-config:
     jobs:
     - path-filtering/filter:
-        base-revision: $(git rev-parse origin/<< pipeline.git.branch >>@{1})
+        base-revision: $(git log -1 --skip=1 --pretty=format:%H {origin/main})
         mapping: |
           backend/.* run-backend-workflow true 
           frontend/.* run-frontend-workflow true
